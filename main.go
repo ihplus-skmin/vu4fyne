@@ -10,7 +10,8 @@ import (
 
 	//"fyne.io/fyne/v2/canvas"
 
-	//"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -25,13 +26,31 @@ func makeUI() (*widget.Label, *widget.Entry) {
 }
 
 func main() {
+	var data = []string{"a", "string", "listwdwwdwdwdwfwfwwfwfwfwfwfwwfw"}
+
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Video Clip Uploader")
 
-	content := widget.NewButton("click me", uploading)
+	list := widget.NewList(
+		func() int {
+			return len(data)
+		},
+		func() fyne.CanvasObject {
+			return widget.NewLabel("template")
+		},
+		func(i widget.ListItemID, o fyne.CanvasObject) {
+			o.(*widget.Label).SetText(data[i])
+		})
+	btn1 := widget.NewButton("click me", uploading)
+	btn2 := widget.NewButton("btn2", func() {})
+	btn3 := widget.NewButton("btn3", func() {})
 
-	myWindow.SetContent(content)
+	content := container.New(layout.NewHBoxLayout(), list)
+	grid := container.New(layout.NewHBoxLayout(), btn1, btn2, btn3)
+
+	myWindow.SetContent(container.New(layout.NewVBoxLayout(), content, grid))
 	myWindow.Resize(fyne.NewSize(500, 200))
+	list.Resize(fyne.NewSize(500, 200))
 	myWindow.ShowAndRun()
 
 	tidyUp()
