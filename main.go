@@ -3,7 +3,7 @@ package main
 import (
 	//"image/color"
 	//"time"
-	"log"
+	//"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -28,9 +28,7 @@ func main() {
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Video Clip Uploader")
 
-	content := widget.NewButton("click me", func() {
-		log.Println("tapped")
-	})
+	content := widget.NewButton("click me", uploading)
 
 	myWindow.SetContent(content)
 	myWindow.Resize(fyne.NewSize(500, 200))
