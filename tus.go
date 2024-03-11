@@ -57,6 +57,7 @@ func uploading(config *config) error {
 
 	if err != nil {
 		sbox.AddLine(err.Error())
+		return err
 	}
 
 	sbox.AddLine("Uplaod Completed")

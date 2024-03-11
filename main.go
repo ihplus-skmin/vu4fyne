@@ -30,7 +30,7 @@ func main() {
 
 	sbox = NewStatusBox(8)
 
-	sbox.AddLine("InHandPlus Video Clip Uploader v.1.0.1\n")
+	sbox.AddLine("InHandPlus Video Clip Uploader v1.0\n")
 
 	err := config.LoadConfig()
 
@@ -47,9 +47,10 @@ func main() {
 	myWindow.SetContent(
 		container.NewPadded(
 			container.NewBorder(
-				widgets.MainForm, container.NewPadded(), container.NewPadded(), container.NewPadded(),
+				widgets.MainForm, container.NewPadded(), container.NewPadded(), container.NewPadded(), widget.NewSeparator(),
 				container.NewVBox(
-					container.NewHBox(layout.NewSpacer(), widgets.Status, layout.NewSpacer()),
+					container.NewPadded(),
+					container.NewHBox(widgets.Status, layout.NewSpacer()),
 					container.NewPadded(),
 					container.NewPadded(),
 					container.NewGridWithColumns(1, sbox.Widget())),

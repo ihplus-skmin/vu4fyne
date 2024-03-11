@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -55,6 +56,7 @@ func (w *Widgets) SetWidgets(config *config) {
 		},
 	)
 
+	btn.Icon = theme.FolderOpenIcon()
 	w.FileSelectBtn = btn
 
 	targetServer := widget.NewSelectEntry([]string{"Dev Server", "Test Server", "Release Server"})
