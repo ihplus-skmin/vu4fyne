@@ -3,38 +3,40 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/eventials/go-tus"
 )
 
-func uploading() {
+func uploading(config *config) error {
 	metadata := map[string]string{
-		"filename": "21IHPA00006A_231013_161517_manual.mp4",
+		"filename": strings.Split(config.UploadFilename, "/")[0],
 		"filetype": "mp4",
-		"timezone": "Asia/Seoul",
+		"timezone": config.Timezone,
 	}
 
-	f, err := os.Open("./21IHPA00006A_231013_161517_manual.mp4")
+	f, err := os.Open(config.UploadFilename)
 
 	if err != nil {
-		fmt.Println("Hey Paniced")
-		return
+		sbox.AddLine(err.Error())
+		return err
 	}
 
 	defer f.Close()
 
 	// create the tus client.
-	client, err := tus.NewClient("http://3.36.35.75:8080/files/", nil)
+	client, err := tus.NewClient(config.ServerAddress+"/files/", nil)
 
 	if err != nil {
-		fmt.Println(err.Error())
-		panic(err)
+		sbox.AddLine(err.Error())
+		return err
 	}
 
 	fi, err := f.Stat()
 
 	if err != nil {
-		return
+		sbox.AddLine(err.Error())
+		return err
 	}
 
 	fingerprint := fmt.Sprintf("%s-%d-%s", fi.Name(), fi.Size(), fi.ModTime())
@@ -45,9 +47,16 @@ func uploading() {
 	uploader, err := client.CreateUpload(upload)
 
 	if err != nil {
-		fmt.Println(err.Error())
-		panic(err)
+		sbox.AddLine(err.Error())
+		return err
 	}
 	// start the uploading process.
-	uploader.Upload()
+	err = uploader.Upload()
+
+	if err != nil {
+		sbox.AddLine(err.Error())
+	}
+
+	sbox.AddLine("Uplaod Completed")
+	return nil
 }

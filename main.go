@@ -1,19 +1,16 @@
 package main
 
 import (
-	//"image/color"
-	//"time"
-	//"log"
+	"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-
-	//"fyne.io/fyne/v2/canvas"
-
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
+
+var sbox *StatusBox
 
 func makeUI() (*widget.Label, *widget.Entry) {
 	out := widget.NewLabel("Hello world!")
@@ -26,36 +23,44 @@ func makeUI() (*widget.Label, *widget.Entry) {
 }
 
 func main() {
-	var data = []string{"a", "string", "listwdwwdwdwdwfwfwwfwfwfwfwfwwfw"}
-
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Video Clip Uploader")
 
-	list := widget.NewList(
-		func() int {
-			return len(data)
-		},
-		func() fyne.CanvasObject {
-			return widget.NewLabel("template")
-		},
-		func(i widget.ListItemID, o fyne.CanvasObject) {
-			o.(*widget.Label).SetText(data[i])
-		})
-	btn1 := widget.NewButton("click me", uploading)
-	btn2 := widget.NewButton("btn2", func() {})
-	btn3 := widget.NewButton("btn3", func() {})
+	config := config{}
 
-	content := container.New(layout.NewHBoxLayout(), list)
-	grid := container.New(layout.NewHBoxLayout(), btn1, btn2, btn3)
+	sbox = NewStatusBox(8)
 
-	myWindow.SetContent(container.New(layout.NewVBoxLayout(), content, grid))
-	myWindow.Resize(fyne.NewSize(500, 200))
-	list.Resize(fyne.NewSize(500, 200))
+	sbox.AddLine("InHandPlus Video Clip Uploader v.1.0.1\n")
+
+	err := config.LoadConfig()
+
+	if err != nil {
+		sbox.AddLine(err.Error())
+	} else {
+		sbox.AddLine("Loaded your saved settings\n")
+	}
+
+	widgets := Widgets{}
+
+	widgets.SetWidgets(&config)
+
+	myWindow.SetContent(
+		container.NewPadded(
+			container.NewBorder(
+				widgets.MainForm, container.NewPadded(), container.NewPadded(), container.NewPadded(),
+				container.NewVBox(
+					container.NewHBox(layout.NewSpacer(), widgets.Status, layout.NewSpacer()),
+					container.NewPadded(),
+					container.NewPadded(),
+					container.NewGridWithColumns(1, sbox.Widget())),
+			)))
+
+	myWindow.Resize(fyne.NewSize(500, 400))
 	myWindow.ShowAndRun()
 
 	tidyUp()
 }
 
 func tidyUp() {
-
+	log.Println("Cleaned up")
 }
