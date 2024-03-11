@@ -3,7 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -15,6 +19,7 @@ type Widgets struct {
 	Timezone      *widget.Select
 	TargetServer  *widget.SelectEntry
 	Status        *widget.TextGrid
+	MainWindow    fyne.Window
 }
 
 func (w *Widgets) SetWidgets(config *config) {
@@ -33,13 +38,24 @@ func (w *Widgets) SetWidgets(config *config) {
 
 	w.Timezone = timezone
 
-	btn1 := widget.NewButton("open",
+	btn := widget.NewButton("open",
 		func() {
-			fmt.Println("open")
+			d := dialog.NewFileOpen(func(f fyne.URIReadCloser, err error) {
+				if f == nil || err != nil {
+					return
+				}
+				config.UploadFilename = f.URI().Path()
+				w.FilenameText.SetText(f.URI().Path())
+
+				filename := strings.Split(config.UploadFilename, "/")
+				sbox.AddLine(fmt.Sprintf("selected file: %s", filename[len(filename)-1]))
+			}, w.MainWindow)
+			d.SetFilter(storage.NewExtensionFileFilter([]string{".pdf"}))
+			d.Show()
 		},
 	)
 
-	w.FileSelectBtn = btn1
+	w.FileSelectBtn = btn
 
 	targetServer := widget.NewSelectEntry([]string{"Dev Server", "Test Server", "Release Server"})
 	targetServer.OnChanged = func(val string) {
@@ -75,7 +91,7 @@ func (w *Widgets) SetWidgets(config *config) {
 
 	mainForm := widget.NewForm(
 		widget.NewFormItem("File name", w.FilenameText),
-		widget.NewFormItem("File select button", btn1),
+		widget.NewFormItem("File select button", btn),
 		widget.NewFormItem("Target server", w.TargetServer),
 		widget.NewFormItem("Timezone", w.Timezone),
 	)
@@ -89,6 +105,7 @@ func (w *Widgets) SetWidgets(config *config) {
 	}
 
 	mainForm.OnCancel = func() {
+		config.SaveConfig()
 		os.Exit(0)
 	}
 

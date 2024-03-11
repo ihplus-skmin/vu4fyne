@@ -9,8 +9,10 @@ import (
 )
 
 func uploading(config *config) error {
+	filename := strings.Split(config.UploadFilename, "/")
+
 	metadata := map[string]string{
-		"filename": strings.Split(config.UploadFilename, "/")[0],
+		"filename": filename[len(filename)-1],
 		"filetype": "mp4",
 		"timezone": config.Timezone,
 	}

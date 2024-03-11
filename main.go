@@ -24,7 +24,7 @@ func makeUI() (*widget.Label, *widget.Entry) {
 
 func main() {
 	myApp := app.New()
-	myWindow := myApp.NewWindow("Video Clip Uploader")
+	myWindow := myApp.NewWindow("Video clip uploader")
 
 	config := config{}
 
@@ -40,7 +40,7 @@ func main() {
 		sbox.AddLine("Loaded your saved settings\n")
 	}
 
-	widgets := Widgets{}
+	widgets := Widgets{MainWindow: myWindow}
 
 	widgets.SetWidgets(&config)
 
@@ -55,12 +55,13 @@ func main() {
 					container.NewGridWithColumns(1, sbox.Widget())),
 			)))
 
-	myWindow.Resize(fyne.NewSize(500, 400))
+	myWindow.Resize(fyne.NewSize(700, 400))
 	myWindow.ShowAndRun()
 
-	tidyUp()
+	tidyUp(config)
 }
 
-func tidyUp() {
+func tidyUp(config config) {
+	config.SaveConfig()
 	log.Println("Cleaned up")
 }
