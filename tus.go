@@ -26,8 +26,20 @@ func uploading(config *config) error {
 
 	defer f.Close()
 
+	var address string
+
+	switch config.ServerAddress {
+	case "Dev Server":
+		address = "https://iotdevserver.inhandplus.com"
+	case "Test Server":
+		address = "https://iottestserver.inhandplus.com"
+	case "Release Server":
+		address = "https://iotserver.inhandplus.com"
+	default:
+		address = config.ServerAddress
+	}
 	// create the tus client.
-	client, err := tus.NewClient(config.ServerAddress+"/files/", nil)
+	client, err := tus.NewClient(address+"/files/", nil)
 
 	if err != nil {
 		sbox.AddLine(err.Error())
@@ -52,6 +64,8 @@ func uploading(config *config) error {
 		sbox.AddLine(err.Error())
 		return err
 	}
+
+	sbox.AddLine("Upload started")
 	// start the uploading process.
 	err = uploader.Upload()
 

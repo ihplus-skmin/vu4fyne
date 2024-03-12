@@ -16,7 +16,26 @@ func (conf *config) LoadConfig() error {
 	data, err := os.Open("./settings.json")
 
 	if err != nil {
-		return err
+		_, err := os.Create("./settings.json")
+
+		if err != nil {
+			sbox.AddLine(err.Error())
+			return err
+		}
+
+		data, err := json.Marshal(conf)
+
+		if err != nil {
+			sbox.AddLine(err.Error())
+			return err
+		}
+
+		err = os.WriteFile("./settings.json", data, 0644)
+
+		if err != nil {
+			sbox.AddLine(err.Error())
+			return err
+		}
 	}
 
 	byteValue, _ := io.ReadAll(data)

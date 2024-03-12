@@ -30,7 +30,29 @@ func (w *Widgets) SetWidgets(config *config) {
 
 	w.FilenameText = label
 
-	timezone := widget.NewSelect([]string{"Asia/Seoul", "America/New_York"},
+	timezone := widget.NewSelect([]string{
+		"Asia/Seoul",
+		"America/New_York",
+		"America/Los_Angeles",
+		"America/Denver",
+		"America/Chicago",
+		"America/Santiago",
+		"America/Buenos_Aires",
+		"US/Alaska",
+		"Europe/London",
+		"Europe/Berlin",
+		"Asia/Qatar",
+		"Asia/Tehran",
+		"Asia/Dubai",
+		"Asia/Kolkata",
+		"Asia/Dhaka",
+		"Asia/Bangkok",
+		"Asia/Taipei",
+		"Australia/Adelaide",
+		"Australia/Brisbane",
+		"Pacific/Auckland",
+		"Pacific/Honolulu",
+	},
 		func(tz string) {
 			config.Timezone = tz
 		})
@@ -51,7 +73,7 @@ func (w *Widgets) SetWidgets(config *config) {
 				filename := strings.Split(config.UploadFilename, "/")
 				sbox.AddLine(fmt.Sprintf("selected file: %s", filename[len(filename)-1]))
 			}, w.MainWindow)
-			d.SetFilter(storage.NewExtensionFileFilter([]string{".pdf"}))
+			d.SetFilter(storage.NewExtensionFileFilter([]string{".mp4"}))
 			d.Show()
 		},
 	)
