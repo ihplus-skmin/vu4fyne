@@ -73,7 +73,7 @@ func (w *Widgets) SetWidgets(config *config) {
 				filename := strings.Split(config.UploadFilename, "/")
 				sbox.AddLine(fmt.Sprintf("selected file: %s", filename[len(filename)-1]))
 			}, w.MainWindow)
-			d.SetFilter(storage.NewExtensionFileFilter([]string{".mp4"}))
+			d.SetFilter(storage.NewExtensionFileFilter([]string{".pdf"}))
 			d.Show()
 		},
 	)

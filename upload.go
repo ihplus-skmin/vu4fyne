@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+type uploadData struct {
+	url            string
+	uploadFilename string
+	fp             *os.File
+	metadata       map[string]string
+}
+
 func uploading(config *config) error {
 	filename := strings.Split(config.UploadFilename, "/")
 
@@ -21,7 +28,7 @@ func uploading(config *config) error {
 		return err
 	}
 
-	//defer f.Close()
+	defer f.Close()
 
 	var url string
 
@@ -36,39 +43,19 @@ func uploading(config *config) error {
 		url = config.ServerAddress
 	}
 
-	fi, err := f.Stat()
-
-	if err != nil {
-		sbox.AddLine(err.Error())
-		return err
+	v := uploadData{
+		url:            url,
+		uploadFilename: config.UploadFilename,
+		fp:             f,
+		metadata:       metadata,
 	}
 
-	err = tusOptions(url)
+	//err = v.vanilla_upload()
+	err = v.go_tus_upload()
 
 	if err != nil {
-		sbox.AddLine("Server failure")
 		return err
 	}
-
-	sbox.AddLine("Server exam. passed")
-
-	location, err := tusPost(url, fi.Size(), metadata)
-
-	if err != nil {
-		sbox.AddLine(err.Error())
-		return err
-	}
-
-	sbox.AddLine("Location suuceefully aquired. \nUpload started")
-
-	err = tusPatch(url, location, f, fi.Size(), config.UploadFilename)
-
-	if err != nil {
-		sbox.AddLine("Upload failure")
-		return err
-	}
-
-	sbox.AddLine("Upload succeeded")
 
 	return nil
 }
