@@ -47,16 +47,18 @@ func main() {
 	myWindow.SetContent(
 		container.NewPadded(
 			container.NewBorder(
-				widgets.MainForm, container.NewPadded(), container.NewPadded(), container.NewPadded(), widget.NewSeparator(),
+				widgets.MainForm, widgets.Progress, container.NewPadded(), container.NewPadded(), widget.NewSeparator(),
 				container.NewVBox(
-					container.NewPadded(),
 					container.NewHBox(widgets.Status, layout.NewSpacer()),
 					container.NewPadded(),
 					container.NewPadded(),
 					container.NewGridWithColumns(1, sbox.Widget())),
-			)))
+			),
+		),
+	)
 
 	myWindow.Resize(fyne.NewSize(700, 400))
+	widgets.Progress.Hidden = true
 	myWindow.ShowAndRun()
 
 	tidyUp(config)

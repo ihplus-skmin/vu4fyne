@@ -10,6 +10,7 @@ type config struct {
 	UploadFilename string `json:"uploadFilename"`
 	ServerAddress  string `json:"serverAddress"`
 	Timezone       string `json:"timezone"`
+	ChunkSize      string `json:"chunkSize"`
 }
 
 func (conf *config) LoadConfig() error {

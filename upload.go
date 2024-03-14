@@ -12,7 +12,7 @@ type uploadData struct {
 	metadata       map[string]string
 }
 
-func uploading(config *config) error {
+func uploading(config *config, w *Widgets) error {
 	filename := strings.Split(config.UploadFilename, "/")
 
 	metadata := map[string]string{
@@ -51,7 +51,7 @@ func uploading(config *config) error {
 	}
 
 	//err = v.vanilla_upload()
-	err = v.go_tus_upload()
+	err = v.go_tus_upload(w)
 
 	if err != nil {
 		return err

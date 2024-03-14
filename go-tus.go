@@ -8,27 +8,36 @@ import (
 	"github.com/eventials/go-tus"
 )
 
-func (v *uploadData) go_tus_upload() (err error) {
+func (v *uploadData) go_tus_upload(w *Widgets) (err error) {
 	fi, err := v.fp.Stat()
 
 	if err != nil {
 		sbox.AddLine(err.Error())
 		return
 	}
-	// create the tus client.
-	client, err := tus.NewClient(v.url+"/files/", nil)
+
+	config := tus.DefaultConfig()
+
+	chunk, err := strconv.ParseInt(w.ChunkSizeEntry.Text, 10, 64)
+
+	if err != nil {
+		sbox.AddLine("Chunk size error")
+		return
+	}
+
+	config.ChunkSize = chunk * 1024 * 1024
+
+	client, err := tus.NewClient(v.url+"/files/", config)
 
 	if err != nil {
 		sbox.AddLine(err.Error())
 		return
 	}
 
-	// create an upload from a file.
 	fingerprint := fmt.Sprintf("%s-%d-%s", fi.Name(), fi.Size(), fi.ModTime())
 
 	upload := tus.NewUpload(v.fp, fi.Size(), v.metadata, fingerprint)
 
-	// create the uploader.
 	uploader, err := client.CreateUpload(upload)
 
 	if err != nil {
@@ -36,19 +45,32 @@ func (v *uploadData) go_tus_upload() (err error) {
 		return
 	}
 
-	// start the uploading process.
 	sbox.AddLine("Upload started")
 
+	w.Progress.Max = float64(fi.Size())
+
+	if client.Config.ChunkSize < fi.Size() {
+		w.Progress.Hidden = false
+	} else {
+		w.Progress.Hidden = true
+	}
+
 	for uploader.Offset() < fi.Size() {
-		sbox.AddLine(strconv.FormatInt(int64(uploader.Offset()), 10))
 		err = uploader.UploadChunck()
 
 		if err != nil {
 			sbox.AddLine(err.Error())
 			return
 		}
-		time.Sleep(3 * time.Second)
+
+		w.Progress.SetValue(float64(uploader.Offset()))
+
+		if client.Config.ChunkSize < fi.Size() && w.TargetServer.Text != "Dev Server" {
+			time.Sleep(3 * time.Second)
+		}
 	}
+
+	w.Progress.SetValue(float64(fi.Size()))
 
 	sbox.AddLine("Upload complete")
 	return nil

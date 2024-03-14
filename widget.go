@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
@@ -13,14 +14,16 @@ import (
 )
 
 type Widgets struct {
-	MainForm      *widget.Form
-	FilenameText  *widget.Label
-	FileSelectBtn *widget.Button
-	Form          *widget.Form
-	Timezone      *widget.Select
-	TargetServer  *widget.SelectEntry
-	Status        *widget.TextGrid
-	MainWindow    fyne.Window
+	MainForm       *widget.Form
+	FilenameText   *widget.Label
+	FileSelectBtn  *widget.Button
+	Form           *widget.Form
+	Timezone       *widget.Select
+	TargetServer   *widget.SelectEntry
+	ChunkSizeEntry *widget.Entry
+	Status         *widget.TextGrid
+	Progress       *widget.ProgressBar
+	MainWindow     fyne.Window
 }
 
 func (w *Widgets) SetWidgets(config *config) {
@@ -63,6 +66,9 @@ func (w *Widgets) SetWidgets(config *config) {
 
 	btn := widget.NewButton("open",
 		func() {
+			w.Progress.Hidden = true
+			w.Progress.SetValue(0.0)
+
 			d := dialog.NewFileOpen(func(f fyne.URIReadCloser, err error) {
 				if f == nil || err != nil {
 					return
@@ -73,7 +79,7 @@ func (w *Widgets) SetWidgets(config *config) {
 				filename := strings.Split(config.UploadFilename, "/")
 				sbox.AddLine(fmt.Sprintf("selected file: %s", filename[len(filename)-1]))
 			}, w.MainWindow)
-			d.SetFilter(storage.NewExtensionFileFilter([]string{".pdf"}))
+			d.SetFilter(storage.NewExtensionFileFilter([]string{".mp4"}))
 			d.Show()
 		},
 	)
@@ -105,6 +111,7 @@ func (w *Widgets) SetWidgets(config *config) {
 	default:
 		break
 	}
+
 	targetServer.Text = config.ServerAddress
 
 	targetServer.OnSubmitted = func(val string) {
@@ -113,15 +120,24 @@ func (w *Widgets) SetWidgets(config *config) {
 
 	w.TargetServer = targetServer
 
+	w.ChunkSizeEntry = widget.NewEntry()
+	w.ChunkSizeEntry.Validator = validation.NewRegexp("^[0-9]+$", "Chunk size must be a number")
+	w.ChunkSizeEntry.Text = config.ChunkSize
+	w.ChunkSizeEntry.OnChanged = func(val string) {
+		config.ChunkSize = val
+	}
+
 	mainForm := widget.NewForm(
 		widget.NewFormItem("File name", w.FilenameText),
 		widget.NewFormItem("File select button", btn),
 		widget.NewFormItem("Target server", w.TargetServer),
 		widget.NewFormItem("Timezone", w.Timezone),
+		widget.NewFormItem("Chunk Size (MiB)", w.ChunkSizeEntry),
 	)
 
 	mainForm.OnSubmit = func() {
-		err := uploading(config)
+		w.Progress.SetValue(0.0)
+		err := uploading(config, w)
 
 		if err != nil {
 			sbox.AddLine("Upload failed.")
@@ -137,4 +153,7 @@ func (w *Widgets) SetWidgets(config *config) {
 	mainForm.CancelText = "Quit"
 
 	w.MainForm = mainForm
+
+	w.Progress = widget.NewProgressBar()
+
 }

@@ -131,10 +131,12 @@ func tusPatch(url string, location string, fp *os.File, fileSize int64, filename
 		return
 	}
 
-	req.Header.Add("Content-Type", "application/offset+octet-stream")
+	req.Header.Set("Content-Type", "application/offset+octet-stream")
 	req.Header.Add("Tus-Resumable", "1.0.0")
 	req.Header.Add("Content-Length", strconv.FormatInt(int64(fileSize), 10))
 	req.Header.Add("Upload-Offset", "0")
+
+	req.Header.Set("X-HTTP-Method-Override", "PATCH")
 
 	res, err := client.Do(req)
 
@@ -142,11 +144,25 @@ func tusPatch(url string, location string, fp *os.File, fileSize int64, filename
 		fmt.Println(err)
 		return
 	}
+
 	defer res.Body.Close()
 
-	if err != nil {
-		fmt.Println(err)
-		return
+	switch res.StatusCode {
+	case 204:
+		if newOffset, err := strconv.ParseInt(res.Header.Get("Upload-Offset"), 10, 64); err == nil {
+			fmt.Println(newOffset)
+			return nil
+		} else {
+			return err
+		}
+	case 409:
+		return errors.New("offset mismatch")
+	case 412:
+		return errors.New("version mismatch")
+	case 413:
+		sbox.AddLine("request entity too large")
+		return errors.New("large upload")
+	default:
+		return errors.New("client error")
 	}
-	return nil
 }
