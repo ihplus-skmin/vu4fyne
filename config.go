@@ -54,6 +54,10 @@ func (conf *config) LoadConfig() error {
 	if conf.Timezone == "" {
 		conf.Timezone = "Asia/Seoul"
 	}
+
+	if conf.ChunkSize == "" {
+		conf.ChunkSize = "40"
+	}
 	return nil
 }
 

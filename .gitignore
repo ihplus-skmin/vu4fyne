@@ -6,6 +6,8 @@
 *.dylib
 *.log
 *.mp4
+vu
+vu.app/
 
 # Test binary, build with `go test -c`
 *.test

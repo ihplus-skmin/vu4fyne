@@ -87,7 +87,7 @@ func (w *Widgets) SetWidgets(config *config) {
 	btn.Icon = theme.FolderOpenIcon()
 	w.FileSelectBtn = btn
 
-	targetServer := widget.NewSelectEntry([]string{"Dev Server", "Test Server", "Release Server"})
+	targetServer := widget.NewSelectEntry([]string{"Dev Server", "Test Server" /*, "Release Server"*/})
 	targetServer.OnChanged = func(val string) {
 		switch val {
 		case "Dev Server":
