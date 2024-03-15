@@ -40,7 +40,7 @@ func main() {
 
 	sbox = NewStatusBox(8)
 
-	sbox.AddLine("InHandPlus Video Clip Uploader v1.0\n")
+	sbox.AddLine("InHandPlus Video Clip Uploader v1.0\nPowered by TUS")
 
 	err = config.LoadConfig()
 
