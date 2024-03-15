@@ -52,9 +52,7 @@ func uploading(config *config, w *Widgets, g tus.Store) error {
 		metadata:       metadata,
 	}
 
-	//err = v.vanilla_upload()
 	err = v.go_tus_upload(w, g)
-	//err = v.ResumeUpload(g)
 
 	if err != nil {
 		return err

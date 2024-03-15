@@ -31,7 +31,7 @@ func main() {
 
 	config := config{}
 
-	garage, err := NewMemoryStore()
+	garage, err := NewSqliteStore()
 
 	if err != nil {
 		fmt.Println(err.Error())

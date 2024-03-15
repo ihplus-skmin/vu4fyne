@@ -8,12 +8,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type MemoryStore struct {
+type SqliteStore struct {
 	tusDB *sql.DB
-	m     map[string]string
 }
 
-func NewMemoryStore() (tus.Store, error) {
+func NewSqliteStore() (tus.Store, error) {
 	db, err := sql.Open("sqlite3", "./database/tus.db")
 
 	if err != nil {
@@ -34,31 +33,20 @@ func NewMemoryStore() (tus.Store, error) {
 		return nil, err
 	}
 
-	return &MemoryStore{
+	return &SqliteStore{
 		tusDB: db,
-		m:     make(map[string]string),
 	}, nil
 }
 
-func (s *MemoryStore) Get(fingerprint string) (string, bool) {
+func (s *SqliteStore) Get(fingerprint string) (string, bool) {
 	query := `
-		SELECT url FROM location WHERE fingerprint = ?
+		SELECT url FROM location WHERE finger_print = ?
 	`
-	rows, err := s.tusDB.Query(query, fingerprint)
-
-	defer rows.Close()
+	rows := s.tusDB.QueryRow(query, fingerprint)
 
 	var url string
 
-	for rows.Next() {
-
-		err = rows.Scan(&url)
-
-		if err != nil {
-			sbox.AddLine(fmt.Sprintf("data reading failed: %s", err.Error()))
-			return "", false
-		}
-	}
+	err := rows.Scan(&url)
 
 	if err != nil {
 		sbox.AddLine(fmt.Sprintf("data reading failed: %s", err.Error()))
@@ -68,7 +56,7 @@ func (s *MemoryStore) Get(fingerprint string) (string, bool) {
 	return url, true
 }
 
-func (s *MemoryStore) Set(fingerprint, url string) {
+func (s *SqliteStore) Set(fingerprint, url string) {
 	query := `
 		INSERT INTO location VALUES(NULL,?,?)
 	`
@@ -79,7 +67,7 @@ func (s *MemoryStore) Set(fingerprint, url string) {
 	}
 }
 
-func (s *MemoryStore) Delete(fingerprint string) {
+func (s *SqliteStore) Delete(fingerprint string) {
 	query := `
 		DELETE FROM location WHERE finger_print = ?
 	`
@@ -91,6 +79,6 @@ func (s *MemoryStore) Delete(fingerprint string) {
 	}
 }
 
-func (s *MemoryStore) Close() {
+func (s *SqliteStore) Close() {
 	s.tusDB.Close()
 }
