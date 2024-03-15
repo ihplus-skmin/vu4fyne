@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"strings"
+
+	"github.com/eventials/go-tus"
 )
 
 type uploadData struct {
@@ -12,7 +14,7 @@ type uploadData struct {
 	metadata       map[string]string
 }
 
-func uploading(config *config, w *Widgets) error {
+func uploading(config *config, w *Widgets, g tus.Store) error {
 	filename := strings.Split(config.UploadFilename, "/")
 
 	metadata := map[string]string{
@@ -51,7 +53,8 @@ func uploading(config *config, w *Widgets) error {
 	}
 
 	//err = v.vanilla_upload()
-	err = v.go_tus_upload(w)
+	err = v.go_tus_upload(w, g)
+	//err = v.ResumeUpload(g)
 
 	if err != nil {
 		return err

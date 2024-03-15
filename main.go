@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"fyne.io/fyne/v2"
@@ -8,6 +9,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/eventials/go-tus"
 )
 
 var sbox *StatusBox
@@ -24,15 +26,23 @@ func makeUI() (*widget.Label, *widget.Entry) {
 
 func main() {
 	myApp := app.New()
+
 	myWindow := myApp.NewWindow("Video clip uploader")
 
 	config := config{}
+
+	garage, err := NewMemoryStore()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 
 	sbox = NewStatusBox(8)
 
 	sbox.AddLine("InHandPlus Video Clip Uploader v1.0\n")
 
-	err := config.LoadConfig()
+	err = config.LoadConfig()
 
 	if err != nil {
 		sbox.AddLine(err.Error())
@@ -42,7 +52,7 @@ func main() {
 
 	widgets := Widgets{MainWindow: myWindow}
 
-	widgets.SetWidgets(&config)
+	widgets.SetWidgets(&config, garage)
 
 	myWindow.SetContent(
 		container.NewPadded(
@@ -61,10 +71,11 @@ func main() {
 	widgets.Progress.Hidden = true
 	myWindow.ShowAndRun()
 
-	tidyUp(config)
+	tidyUp(config, garage)
 }
 
-func tidyUp(config config) {
+func tidyUp(config config, garage tus.Store) {
 	config.SaveConfig()
+	garage.Close()
 	log.Println("Cleaned up")
 }

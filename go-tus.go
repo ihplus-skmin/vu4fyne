@@ -8,7 +8,7 @@ import (
 	"github.com/eventials/go-tus"
 )
 
-func (v *uploadData) go_tus_upload(w *Widgets) (err error) {
+func (v *uploadData) go_tus_upload(w *Widgets, garage tus.Store) (err error) {
 	fi, err := v.fp.Stat()
 
 	if err != nil {
@@ -26,6 +26,8 @@ func (v *uploadData) go_tus_upload(w *Widgets) (err error) {
 	}
 
 	config.ChunkSize = chunk * 1024 * 1024
+	config.Resume = true
+	config.Store = garage
 
 	client, err := tus.NewClient(v.url+"/files/", config)
 
@@ -70,8 +72,48 @@ func (v *uploadData) go_tus_upload(w *Widgets) (err error) {
 		}
 	}
 
+	garage.Delete(fingerprint)
+
 	w.Progress.SetValue(float64(fi.Size()))
 
 	sbox.AddLine("Upload complete")
+	return nil
+}
+
+func (v *uploadData) ResumeUpload(garage tus.Store) (err error) {
+	fi, err := v.fp.Stat()
+
+	if err != nil {
+		sbox.AddLine(err.Error())
+		return
+	}
+
+	config := tus.DefaultConfig()
+
+	config.Resume = true
+	config.Store = garage
+
+	client, err := tus.NewClient(v.url+"/files/", config)
+
+	if err != nil {
+		return
+	}
+
+	upload := tus.NewUpload(v.fp, fi.Size(), v.metadata, "fingerprint")
+
+	uploader, err := client.ResumeUpload(upload)
+
+	if err != nil {
+		return
+	}
+
+	for uploader.Offset() < fi.Size() {
+		err = uploader.UploadChunck()
+
+		if err != nil {
+			return
+		}
+	}
+
 	return nil
 }

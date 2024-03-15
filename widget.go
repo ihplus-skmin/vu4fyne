@@ -11,6 +11,7 @@ import (
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"github.com/eventials/go-tus"
 )
 
 type Widgets struct {
@@ -26,7 +27,7 @@ type Widgets struct {
 	MainWindow     fyne.Window
 }
 
-func (w *Widgets) SetWidgets(config *config) {
+func (w *Widgets) SetWidgets(config *config, garage tus.Store) {
 	w.Status = widget.NewTextGrid()
 	label := widget.NewLabel(config.UploadFilename)
 	label.SetText(config.UploadFilename)
@@ -137,7 +138,7 @@ func (w *Widgets) SetWidgets(config *config) {
 
 	mainForm.OnSubmit = func() {
 		w.Progress.SetValue(0.0)
-		err := uploading(config, w)
+		err := uploading(config, w, garage)
 
 		if err != nil {
 			sbox.AddLine("Upload failed.")
@@ -146,6 +147,7 @@ func (w *Widgets) SetWidgets(config *config) {
 
 	mainForm.OnCancel = func() {
 		config.SaveConfig()
+		garage.Close()
 		os.Exit(0)
 	}
 
