@@ -1,0 +1,23 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.log
+*.mp4
+vu
+vu.app/
+database/*
+vendor/
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+main/__debug_bin
+vendor/modules.txt
+.env
+task-definition.json
