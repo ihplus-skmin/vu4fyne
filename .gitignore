@@ -10,6 +10,7 @@ vu
 vu.app/
 database/*
 vendor/
+settings.json
 
 # Test binary, build with `go test -c`
 *.test
