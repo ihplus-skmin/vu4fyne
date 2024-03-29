@@ -8,6 +8,8 @@
 *.mp4
 vu
 vu.app/
+database/*
+vendor/
 
 # Test binary, build with `go test -c`
 *.test
@@ -15,12 +17,7 @@ vu.app/
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-log/
 main/__debug_bin
 vendor/modules.txt
 .env
-.github/workflows/docker-image.yml
 task-definition.json
-rustlib/Cargo.lock
-rustlib/
-templates/

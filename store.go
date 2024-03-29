@@ -49,7 +49,6 @@ func (s *SqliteStore) Get(fingerprint string) (string, bool) {
 	err := rows.Scan(&url)
 
 	if err != nil {
-		sbox.AddLine(fmt.Sprintf("data reading failed: %s", err.Error()))
 		return "", false
 	}
 
