@@ -67,7 +67,7 @@ func (v *uploadData) go_tus_upload(w *Widgets, garage tus.Store) (err error) {
 
 		w.Progress.SetValue(float64(uploader.Offset()))
 
-		if client.Config.ChunkSize < fi.Size() && w.TargetServer.Text != "Dev Server" {
+		if client.Config.ChunkSize < fi.Size() && w.TargetServer.Text == "Test Server" {
 			time.Sleep(3 * time.Second)
 		}
 	}
