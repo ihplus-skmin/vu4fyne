@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	"github.com/eventials/go-tus"
 	_ "github.com/mattn/go-sqlite3"
@@ -13,6 +14,15 @@ type SqliteStore struct {
 }
 
 func NewSqliteStore() (tus.Store, error) {
+	_, err := os.Stat("./database")
+
+	if err != nil {
+		err = os.Mkdir("./database", 0755)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	db, err := sql.Open("sqlite3", "./database/tus.db")
 
 	if err != nil {
